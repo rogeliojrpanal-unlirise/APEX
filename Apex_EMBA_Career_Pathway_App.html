@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Clarity Check — Apex École de Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    min-height: 100vh; background: #EDF0F5;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    padding: 20px; color: #0d2845;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 700px 500px at 18% 8%, rgba(196,163,115,0.16) 0%, transparent 64%),
+      radial-gradient(ellipse 640px 520px at 82% 92%, rgba(13,40,69,0.09) 0%, transparent 64%);
+    pointer-events: none; z-index: 0;
+  }
+  #root { width: 100%; display: flex; justify-content: center; position: relative; z-index: 1; }
+
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(22px) } to { opacity:1; transform:translateY(0) } }
+  @keyframes scaleIn  { from { opacity:0; transform:scale(0.94) }      to { opacity:1; transform:scale(1) } }
+  @keyframes glowPulse { 0%,100%{box-shadow:0 0 0 0 rgba(196,163,115,0.30)} 50%{box-shadow:0 0 0 8px rgba(196,163,115,0)} }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  .anim-fadeUp  { animation: fadeUp 0.45s cubic-bezier(0.22,1,0.36,1) forwards; }
+  .anim-scaleIn { animation: scaleIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards; }
+  .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,0.45); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; }
+
+  .opt {
+    width: 100%; text-align: left; cursor: pointer;
+    background: #FFFFFF; border: 1.5px solid #E1E5EC; border-radius: 12px; padding: 15px 18px;
+    color: #1a2438; font-family: 'Inter', sans-serif; font-size: 14.5px; font-weight: 400; line-height: 1.5;
+    transition: all 0.17s ease; display: flex; align-items: center; gap: 14px;
+  }
+  .opt:hover { background: #FBF8F2; border-color: #c4a373; transform: translateX(5px); }
+  .opt.sel  { background: #FBF8F2; border-color: #c4a373; border-width: 2px; }
+  .opt-radio {
+    width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #C3C9D2; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; transition: all 0.17s ease; background: transparent;
+  }
+  .sel .opt-radio { background: #c4a373; border-color: #c4a373; }
+  .opt-radio-dot { width: 7px; height: 7px; border-radius: 50%; background: #FFFFFF; opacity: 0; transition: opacity 0.17s ease; }
+  .sel .opt-radio-dot { opacity: 1; }
+
+  .btn-primary {
+    width: 100%; background: #9c7b3f; color: #FFFFFF; border: none; border-radius: 12px; padding: 17px 24px;
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: 0.01em;
+  }
+  .btn-primary:hover:not(:disabled) { background: #876a35; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(156,123,63,0.30); }
+  .btn-primary:active:not(:disabled) { transform: translateY(0); box-shadow: none; }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .btn-secondary {
+    width: 100%; background: transparent; border: 1.5px solid #D2D7DF; border-radius: 12px; padding: 14px 24px;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #6a7b94; cursor: pointer;
+    transition: all 0.2s ease; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: #c4a373; color: #5a4a2a; }
+  .btn-secondary:disabled { opacity: 0.55; cursor: default; }
+
+  .btn-back {
+    background: none; border: none; color: #97a0b0; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 13px;
+    display: flex; align-items: center; gap: 5px; padding: 2px 0; transition: color 0.15s ease;
+  }
+  .btn-back:hover { color: #0d2845; }
+
+  .btn-start {
+    background: #9c7b3f; color: #FFFFFF; border: none; border-radius: 12px; padding: 17px 32px;
+    font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+    display: inline-flex; align-items: center; gap: 10px; letter-spacing: 0.01em;
+  }
+  .btn-start:hover { background: #876a35; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(156,123,63,0.30); }
+
+  .f-input {
+    width: 100%; background: #FFFFFF; border: 1.5px solid #DBE0E8; border-radius: 10px; padding: 14px 16px;
+    color: #1a2438; font-family: 'Inter', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s ease;
+  }
+  .f-input:focus { border-color: #c4a373; }
+  .f-input::placeholder { color: #AEB6C2; }
+
+  .cv-drop {
+    width:100%; border:1.5px dashed #C9CFD9; border-radius:10px; padding:14px 16px; cursor:pointer;
+    display:flex; align-items:center; gap:11px; transition:all 0.18s ease; background:#FCFDFE;
+  }
+  .cv-drop:hover { border-color:#c4a373; background:#FBF8F2; }
+  .cv-drop.has { border-style:solid; border-color:#c4a373; background:#FBF5EA; }
+
+  .prog-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, #c4a373, #ddc59c); transition: width 0.6s cubic-bezier(0.22,1,0.36,1); }
+
+  @media (max-width: 520px) {
+    body { padding: 12px; align-items: flex-start; padding-top: 20px; }
+    .quiz-pad { padding: 28px 24px 36px !important; }
+    .intro-pad { padding: 40px 28px 40px !important; }
+    .result-hero { padding: 36px 28px 32px !important; }
+    .result-body { padding: 28px 28px 36px !important; }
+    h1.serif-xl { font-size: 30px !important; }
+    h2.serif-lg { font-size: 22px !important; }
+    h1.result-hl { font-size: 28px !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚙️  CONFIG — EDIT THESE THREE VALUES, THEN THE APP IS LIVE
+   ─────────────────────────────────────────────────────────────────────────
+   WEBHOOK_URL   : paste your n8n Webhook "Production URL" here (see setup guide)
+   CALENDLY_URL  : your advisor booking link (already set)
+   ADVISOR_EMAIL : where the detailed advisor notification is sent
+   ═══════════════════════════════════════════════════════════════════════════ */
+const CONFIG = {
+  WEBHOOK_URL:   "https://unlirise.app.n8n.cloud/webhook/apex-career-pathway",
+  CALENDLY_URL:  "https://calendly.com/rogelio-apexedu/discoverymeeting",
+  ADVISOR_EMAIL: "rogelio@apexedu.fr",
+};
+
+/* ───────────────────────────────────────────────────────────────────────────
+   APEX ECOLE DE MANAGEMENT — CAREER CLARITY CHECK + CAREER PATHWAY ADVISORY
+   Flow: intro -> 7 scored BANT questions -> 2 profile questions
+         -> contact capture (+ optional CV) -> personalised advisory result.
+   On submit, the app POSTs a payload (lead + score/profile + focus + CV base64
+   + two ready-to-send HTML emails) to the n8n WEBHOOK_URL, which stores the CV
+   in Google Drive and sends a brief email to the prospect + a detailed one to
+   the advisor.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+const QS = [
+  { id:1, bant:'authority',
+    q:"What best describes your current role level?",
+    sub:"This shapes which entry point is the right fit — not a test, just context.",
+    options:[
+      { label:"Experienced professional or team contributor (3–6 yrs)", score:6,  tag:"desig:professional" },
+      { label:"Manager or Senior Manager",                              score:7,  tag:"desig:manager" },
+      { label:"Director, Head of Department, or Associate Director",    score:9,  tag:"desig:director" },
+      { label:"VP, C-Suite, GM, Partner, or Business Owner",           score:10, tag:"desig:c_suite" },
+      { label:"Early-career professional (1–3 yrs)",                    score:5,  tag:"desig:early_career" },
+    ]},
+  { id:2, bant:'need',
+    affirmation:"That tension is shared by more senior leaders than most let on.",
+    q:"What's holding you back professionally right now?",
+    sub:"Be honest — your result is shaped around this answer.",
+    options:[
+      { label:"Being overlooked despite years of experience",          score:9,  tag:"barrier:promo_blocked" },
+      { label:"Lacking a formal credential my peers already have",      score:10, tag:"barrier:credential_gap" },
+      { label:"Staying ahead of rapid industry change",                score:8,  tag:"barrier:future_ready" },
+      { label:"Building authority in a new sector or market",          score:7,  tag:"barrier:authority" },
+      { label:"Nothing's holding me back — I'm ready",                 score:10, tag:"barrier:ready_now" },
+    ]},
+  { id:3, bant:'authority',
+    affirmation:"Your experience is exactly the foundation this programme is built on.",
+    q:"How many years of professional experience do you have?",
+    sub:"Total working experience — not just in your current role.",
+    options:[
+      { label:"Fewer than 5 years", score:4,  tag:"exp:under_5" },
+      { label:"5 to 10 years",      score:7,  tag:"exp:5_10" },
+      { label:"11 to 15 years",     score:9,  tag:"exp:11_15" },
+      { label:"More than 15 years", score:10, tag:"exp:15_plus" },
+    ]},
+  { id:4, bant:'need',
+    q:"What matters most to you in an Executive MBA?",
+    sub:"Your real priority — not what sounds impressive.",
+    options:[
+      { label:"International recognition by global employers", score:9, tag:"priority:recognition" },
+      { label:"Studying 100% online without pausing my career", score:8, tag:"priority:flexibility" },
+      { label:"The calibre of a small senior peer cohort", score:7, tag:"priority:network" },
+      { label:"Clear, measurable career ROI", score:9, tag:"priority:roi" },
+      { label:"Completing in 12 months, not 2–3 years", score:7, tag:"priority:speed" },
+    ]},
+  { id:5, bant:'authority',
+    q:"Where are you based?",
+    sub:"We'll personalise your results with alumni from your region.",
+    options:[
+      { label:"Africa",          score:8, tag:"geo:africa" },
+      { label:"UAE / GCC",       score:8, tag:"geo:gcc" },
+      { label:"India",           score:8, tag:"geo:india" },
+      { label:"Europe",          score:7, tag:"geo:europe" },
+      { label:"Somewhere else",  score:6, tag:"geo:other" },
+    ]},
+  { id:6, bant:'timeline',
+    q:"When are you hoping to start?",
+    sub:"Approximate is completely fine.",
+    options:[
+      { label:"Within the next 3 months",         score:10, tag:"start:immediate" },
+      { label:"In the next 6–12 months",          score:7,  tag:"start:mid_term" },
+      { label:"More than a year from now",        score:4,  tag:"start:long_term" },
+      { label:"When I find the right programme",  score:8,  tag:"start:prog_dependent" },
+    ]},
+  { id:7, bant:'budget',
+    affirmation:"There's almost always a path that works — more often than people expect.",
+    q:"How are you thinking about funding your studies?",
+    sub:"No wrong answers — this just helps us point you to the right options.",
+    options:[
+      { label:"I'd invest personally if the programme is the right fit", score:10, tag:"budget:self_funded" },
+      { label:"My employer may support it — worth exploring",            score:8,  tag:"budget:employer" },
+      { label:"I want to see the return before I commit to anything",    score:7,  tag:"budget:roi_first" },
+      { label:"Affordability matters — I need flexible payment options", score:5,  tag:"budget:budget_sensitive" },
+    ]},
+];
+
+const PROFILE_QS = [
+  { key:'focus', kicker:'Your goal',
+    q:"Which area do you most want to grow in?",
+    sub:"This shapes the career pathways we map for you.",
+    options:[
+      { label:"Finance, accounting & feasibility", val:"finance" },
+      { label:"Strategy & leadership",             val:"strategy" },
+      { label:"Marketing & business growth",        val:"marketing" },
+      { label:"Operations & supply chain",          val:"operations" },
+      { label:"People & team leadership",           val:"people" },
+      { label:"Data & decision-making",             val:"data" },
+    ]},
+  { key:'edu', kicker:'Your background',
+    q:"What is your highest qualification so far?",
+    sub:"No judgment on where you start — it just helps us place you.",
+    options:[
+      { label:"Bachelor's degree",                       val:"bachelors" },
+      { label:"Postgraduate diploma or certificate",     val:"pgdip" },
+      { label:"Master's degree or MBA",                  val:"masters" },
+      { label:"Professional qualification (ACCA, CFA, CPA, CIMA)", val:"professional" },
+      { label:"Doctorate or PhD",                        val:"doctorate" },
+    ]},
+];
+
+const MAX_SCORE = QS.reduce((m,q)=> m + Math.max(...q.options.map(o=>o.score)), 0); // 67
+const getProfile = s => (s >= 58 ? 'hot' : s >= 50 ? 'warm' : 'cold');
+
+const PROFILES = {
+  hot:  { badge:"Strong Candidate",   headline:"your path is clear.",            scoreLabel:"Ready to enrol",
+          body:"You're at the right career stage, with genuine momentum behind you, and the timing is right.",
+          accentColor:"#9c7b3f", accentBg:"#FBF5EA", accentBorder:"#E7D4A8" },
+  warm: { badge:"Building Momentum",  headline:"you're closer than you think.",  scoreLabel:"Active consideration",
+          body:"You're thinking seriously and moving in the right direction — a short conversation will bring real clarity.",
+          accentColor:"#0f7a5a", accentBg:"#EAF7F2", accentBorder:"#A3DDCA" },
+  cold: { badge:"Early Exploration",  headline:"every strong decision starts here.", scoreLabel:"Exploring options",
+          body:"You're early in something that genuinely matters — let's map it out clearly, with no pressure.",
+          accentColor:"#41539e", accentBg:"#EEF0FA", accentBorder:"#C3C8EC" },
+};
+
+const FOCI = {
+  finance:    { title:"Finance, accounting & feasibility",
+    modules:["Corporate Finance","Management Accounting","Business Analytics"],
+    capstone:"be a real feasibility study on a project from your own workplace",
+    pathways:["Finance Officer → Finance Manager → Head of Finance & Planning",
+              "Project / Feasibility Analyst → Investment Officer → Head of Strategy"] },
+  strategy:   { title:"Strategy & leadership",
+    modules:["Strategic Management","Strategic Leadership & HR Practices","Business Analytics"],
+    capstone:"tackle a real strategic challenge in your organisation",
+    pathways:["Strategy & Planning Manager → Head of Strategy → Director / GM",
+              "Business Unit Lead → Chief Operating Officer"] },
+  marketing:  { title:"Marketing & business growth",
+    modules:["International Marketing Management","Business Analytics","Strategic Management"],
+    capstone:"build a go-to-market or growth plan for a real product",
+    pathways:["Marketing Manager → Head of Marketing → CMO",
+              "Growth / BD Lead → Commercial Director"] },
+  operations: { title:"Operations & supply chain",
+    modules:["Supply Chain & Logistics in Global Context","Business Analytics","Strategic Management"],
+    capstone:"redesign a real operations or supply-chain process",
+    pathways:["Operations Manager → Head of Operations → COO",
+              "Supply Chain Lead → Director of Operations"] },
+  people:     { title:"People & team leadership",
+    modules:["Strategic Leadership & HR Practices","Strategic Management","Sustainability & Business"],
+    capstone:"design a real people or capability-building initiative",
+    pathways:["People / HR Manager → Head of People → CHRO",
+              "Org Development Lead → Director of People & Culture"] },
+  data:       { title:"Data & decision-making",
+    modules:["Application of Business Analytics","Corporate Finance","Strategic Management"],
+    capstone:"turn a real business question into a data-driven recommendation",
+    pathways:["Business Analyst → Analytics Manager → Head of Insights",
+              "Strategy Analyst → Planning Manager → Head of Strategy"] },
+};
+
+const ROLE_SHORT    = { early_career:"an early-career professional", professional:"an experienced professional", manager:"a manager", director:"a senior leader", c_suite:"an executive" };
+const EXP_SHORT     = { under_5:"a few years", "5_10":"5–10 years", "11_15":"over a decade", "15_plus":"15+ years" };
+const BARRIER_SHORT = { promo_blocked:"being overlooked despite your experience", credential_gap:"a missing formal credential", future_ready:"staying ahead of industry change", authority:"building authority in a new space", ready_now:"being ready for your next step" };
+const EDU_SHORT     = { bachelors:"a bachelor's degree", pgdip:"a postgraduate diploma", masters:"a master's", professional:"a professional qualification", doctorate:"a doctorate" };
+
+const tagVal   = (ans, id) => { const a = ans[id]; return a ? a.tag.split(':')[1] : null; };
+const ansLabel = (ans, id) => { const a = ans[id]; return a ? a.label : '—'; };
+
+/* Build the derived advisory object used by both the on-screen Result and the emails */
+function buildAdvisory(answers, focus, edu, score) {
+  const profileKey = getProfile(score);
+  const P = PROFILES[profileKey];
+  const F = FOCI[focus] || FOCI.finance;
+  const roleTxt    = ROLE_SHORT[tagVal(answers,1)] || "a working professional";
+  const expTxt     = EXP_SHORT[tagVal(answers,3)] || "your experience";
+  const barrierTxt = BARRIER_SHORT[tagVal(answers,2)] || "your next step";
+  const eduTxt     = EDU_SHORT[edu] || "your qualifications";
+  const where = `You're ${roleTxt} with ${expTxt} of experience and ${eduTxt} behind you. You told us ${barrierTxt} is what's in the way — exactly the kind of gap a focused executive credential is built to close.`;
+  return { profileKey, P, F, roleTxt, expTxt, barrierTxt, eduTxt, where };
+}
+
+/* ─── EMAIL BUILDERS (inline-styled HTML, email-client safe) ──────────────── */
+const ESC = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function emailProspect(form, A) {
+  const chips = A.F.modules.map(m=>`<span style="display:inline-block;background:#FBF5EA;border:1px solid #E7D4A8;border-radius:6px;padding:5px 11px;font-size:13px;color:#0d2845;margin:0 6px 7px 0;">${ESC(m)}</span>`).join('');
+  const paths = A.F.pathways.map((p,i)=>`<tr><td style="vertical-align:top;padding:5px 10px 5px 0;width:26px;"><div style="width:24px;height:24px;border-radius:50%;background:#0d2845;color:#e8cf9c;font-weight:700;text-align:center;line-height:24px;font-size:13px;">${i+1}</div></td><td style="padding:5px 0;font-size:14px;color:#28303f;line-height:1.5;">${ESC(p)}</td></tr>`).join('');
+  const first = form.name ? ESC(form.name.trim().split(' ')[0]) : 'there';
+  return `<div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;color:#28303f;">
+  <div style="padding:6px 0 18px;"><span style="display:inline-block;width:30px;height:30px;background:#c4a373;border-radius:7px;color:#0d2845;font-weight:700;text-align:center;line-height:30px;font-family:Georgia,serif;">A</span> <span style="font-family:Georgia,serif;letter-spacing:0.14em;color:#0d2845;font-weight:600;">APEX</span> <span style="color:#8a93a4;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;">École de Management</span></div>
+  <div style="background:${A.P.accentBg};border:1px solid ${A.P.accentBorder};border-radius:14px;padding:22px 22px 20px;">
+    <div style="font-size:11px;color:${A.P.accentColor};letter-spacing:0.08em;text-transform:uppercase;font-weight:700;margin-bottom:8px;">${ESC(A.P.badge)} · Your career pathway</div>
+    <div style="font-family:Georgia,serif;font-size:24px;color:#0d2845;line-height:1.2;font-weight:700;">${first}, ${ESC(A.P.headline)}</div>
+    <div style="font-size:14px;color:#54607a;line-height:1.6;margin-top:8px;">${ESC(A.P.body)}</div>
+  </div>
+  <p style="font-size:11px;color:#9aa3b2;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;margin:22px 0 6px;">Where you are</p>
+  <p style="font-size:14px;color:#3a4759;line-height:1.7;margin:0;">${ESC(A.where)}</p>
+  <div style="background:#FBF7F0;border:1px solid #EADFC9;border-left:3px solid #c4a373;border-radius:0 12px 12px 0;padding:16px 18px;margin:18px 0;">
+    <p style="font-size:11px;color:#9c7b3f;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;margin:0 0 8px;">How the Apex EMBA builds your goal — ${ESC(A.F.title)}</p>
+    <p style="font-size:13.5px;color:#3a4759;line-height:1.6;margin:0 0 12px;">There isn't a single module named for your exact goal — and we'd rather be straight about that. But it's built right through the programme:</p>
+    <div style="margin-bottom:10px;">${chips}</div>
+    <p style="font-size:13.5px;color:#3a4759;line-height:1.6;margin:0;">Better still, your <b style="color:#0d2845;">capstone project</b> can ${ESC(A.F.capstone)} — so you graduate with proof, not just theory.</p>
+  </div>
+  <p style="font-size:11px;color:#9aa3b2;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;margin:18px 0 8px;">Your career pathways</p>
+  <table style="border-collapse:collapse;">${paths}</table>
+  <div style="text-align:center;margin:26px 0 8px;">
+    <a href="${ESC(CONFIG.CALENDLY_URL)}" style="display:inline-block;background:#9c7b3f;color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 34px;border-radius:10px;">Book My Advisor Call →</a>
+    <div style="font-size:12px;color:#9aa3b2;margin-top:9px;">No commitment · 20 minutes · Your questions answered properly</div>
+  </div>
+  <div style="border-top:1px solid #EBEEF3;margin-top:22px;padding-top:16px;text-align:center;font-size:11px;color:#a8b0bd;">
+    EQF Level 7 · 90 ECTS &nbsp;·&nbsp; Dual Certification · France + UK &nbsp;·&nbsp; 100% Online · 12 Months &nbsp;·&nbsp; Cohort of 24<br>
+    <span style="font-family:Georgia,serif;font-style:italic;color:#b9c0cb;">Apex École de Management · Lyon · Paris — Learning today. Leading tomorrow.</span>
+  </div>
+</div>`;
+}
+
+function emailAdvisor(form, A, answers, profileAns, score) {
+  const row = (k,v)=>`<tr><td style="padding:5px 12px;background:#F4F6FA;border:1px solid #E3E7EE;color:#7c8595;font-size:11px;text-transform:uppercase;letter-spacing:0.04em;font-weight:600;white-space:nowrap;">${ESC(k)}</td><td style="padding:5px 12px;border:1px solid #E3E7EE;font-size:13px;color:#28303f;">${v}</td></tr>`;
+  const paths = A.F.pathways.map((p,i)=>`<li style="margin-bottom:4px;font-size:13px;color:#28303f;">${ESC(p)}</li>`).join('');
+  const answersList = QS.map(q=>`<li style="margin-bottom:3px;font-size:12.5px;color:#3a4759;"><b style="color:#0d2845;">${ESC(q.q)}</b> — ${ESC(ansLabel(answers,q.id))}</li>`).join('');
+  const cvLine = form.cvName
+    ? `<b style="color:#0f7a5a;">${ESC(form.cvName)}</b> — attached to this email and saved to your Apex Drive folder.`
+    : `<span style="color:#9aa3b2;">No CV attached by the prospect.</span>`;
+  return `<div style="font-family:Inter,Arial,sans-serif;max-width:620px;margin:0 auto;color:#28303f;">
+  <div style="padding:4px 0 14px;font-family:Georgia,serif;letter-spacing:0.14em;color:#0d2845;font-weight:600;">APEX · ADVISOR LEAD</div>
+  <div style="background:#0d2845;color:#eaeef4;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+    <div style="font-size:18px;font-family:Georgia,serif;color:#fff;">New Career Clarity submission — ${ESC(form.name)||'(no name)'}</div>
+    <div style="font-size:13px;color:#c5cedb;margin-top:4px;">Profile: <b style="color:#e8cf9c;">${ESC(A.P.badge)}</b> · Score ${score}/${MAX_SCORE} · Focus: <b style="color:#e8cf9c;">${ESC(A.F.title)}</b></div>
+  </div>
+  <table style="border-collapse:collapse;width:100%;margin-bottom:16px;">
+    ${row('Name', ESC(form.name)||'—')}
+    ${row('Email', form.email?`<a href="mailto:${ESC(form.email)}" style="color:#9c7b3f;">${ESC(form.email)}</a>`:'—')}
+    ${row('WhatsApp', form.whatsapp?ESC(form.whatsapp):'<span style="color:#9aa3b2;">not provided</span>')}
+    ${row('Region', ESC(ansLabel(answers,5)))}
+    ${row('Goal focus', ESC(A.F.title))}
+    ${row('Highest qualification', ESC(EDU_SHORT[profileAns.edu]||'—'))}
+    ${row('Wants to start', ESC(ansLabel(answers,6)))}
+    ${row('Funding stance', ESC(ansLabel(answers,7)))}
+    ${row('CV', cvLine)}
+  </table>
+  <p style="font-size:11px;color:#9aa3b2;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;margin:0 0 6px;">Where they are</p>
+  <p style="font-size:13.5px;color:#3a4759;line-height:1.65;margin:0 0 14px;">${ESC(A.where)}</p>
+  <p style="font-size:11px;color:#9aa3b2;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;margin:0 0 6px;">All answers</p>
+  <ul style="margin:0 0 14px 18px;padding:0;">${answersList}</ul>
+  <p style="font-size:11px;color:#9aa3b2;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;margin:0 0 6px;">Mapped pathways (${ESC(A.F.title)})</p>
+  <ul style="margin:0 0 14px 18px;padding:0;">${paths}</ul>
+  <div style="background:#FBF7F0;border-left:3px solid #c4a373;border-radius:0 8px 8px 0;padding:12px 15px;font-size:13px;color:#3a4759;line-height:1.6;">
+    <b style="color:#0d2845;">Suggested next step:</b> they've been sent their brief result and the booking link
+    (<a href="${ESC(CONFIG.CALENDLY_URL)}" style="color:#9c7b3f;">${ESC(CONFIG.CALENDLY_URL)}</a>).
+    ${A.profileKey==='hot'?'High intent — reach out within 4 hours.':A.profileKey==='warm'?'Warm — follow up within 24–48 hours; lead with the live session.':'Early-stage — light, no-pressure nurture; offer the guide first.'}
+  </div>
+  <div style="border-top:1px solid #EBEEF3;margin-top:18px;padding-top:12px;font-size:11px;color:#a8b0bd;font-family:Georgia,serif;font-style:italic;">Apex École de Management · Career Clarity pipeline</div>
+</div>`;
+}
+
+/* read a File to base64 (without the data: prefix) */
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(',')[1] || '');
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+/* POST to n8n. text/plain keeps it a "simple request" (no CORS preflight). */
+async function postToWebhook(payload) {
+  if (!CONFIG.WEBHOOK_URL || CONFIG.WEBHOOK_URL.indexOf('http') !== 0) {
+    throw new Error('WEBHOOK_URL not configured');
+  }
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    await fetch(CONFIG.WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal,
+      mode: 'cors',
+      keepalive: true,
+    });
+  } finally { clearTimeout(t); }
+}
+
+/* ─── ICONS ─────────────────────────────────────────────────────────────── */
+const Ic = {
+  ArrowLeft: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
+  ChevRight: () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
+  Calendar:  () => <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+  Mail:      () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
+  Paperclip: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>,
+  Check:     () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+  Compass:   () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>,
+};
+
+/* ─── SHELL ──────────────────────────────────────────────────────────────── */
+function Card({ children, visible }) {
+  return (
+    <div style={{
+      width:'100%', maxWidth:'560px', background:'#FFFFFF', border:'1px solid #E3E7EE',
+      borderRadius:'20px', overflow:'hidden',
+      boxShadow:'0 24px 60px rgba(13,40,69,0.12), 0 2px 8px rgba(13,40,69,0.06)',
+      opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(12px)',
+      transition:'opacity 0.3s ease, transform 0.3s ease',
+    }}>{children}</div>
+  );
+}
+
+function Wordmark({ sub = "École de Management", size = 'md' }) {
+  const s = size === 'sm';
+  return (
+    <div style={{ display:'flex', alignItems:'center', gap: s ? '9px' : '11px' }}>
+      <div style={{ width: s?'30px':'36px', height: s?'30px':'36px', background:'linear-gradient(135deg, #c4a373, #a98a55)',
+        borderRadius: s?'8px':'9px', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 2px 8px rgba(196,163,115,0.35)' }}>
+        <span style={{ color:'#0d2845', fontFamily:"'Fraunces', Georgia, serif", fontSize: s?'17px':'21px', fontWeight:'700', lineHeight:1 }}>A</span>
+      </div>
+      <div style={{ display:'flex', flexDirection:'column', gap:'1px' }}>
+        <span style={{ color:'#0d2845', fontFamily:"'Fraunces', Georgia, serif", fontSize: s?'14px':'16px', fontWeight:'600', letterSpacing:'0.16em' }}>APEX</span>
+        <span style={{ color:'#8a93a4', fontSize: s?'8.5px':'9.5px', letterSpacing:'0.14em', textTransform:'uppercase' }}>{sub}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ─── INTRO ──────────────────────────────────────────────────────────────── */
+function Intro({ onStart }) {
+  return (
+    <div className="anim-fadeUp intro-pad" style={{ padding:'48px 40px 44px' }}>
+      <div style={{ marginBottom:'36px' }}><Wordmark /></div>
+      <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'#FBF5EA', border:'1px solid #E7D4A8',
+        borderRadius:'20px', padding:'4px 14px', color:'#8a6a2f', fontSize:'11.5px', fontWeight:'600',
+        letterSpacing:'0.07em', textTransform:'uppercase', marginBottom:'20px' }}>
+        <span style={{ fontSize:'10px' }}>✦</span> Career Clarity Check
+      </div>
+      <h1 className="serif-xl" style={{ fontFamily:"'Fraunces', Georgia, serif", fontSize:'38px', fontWeight:'600',
+        lineHeight:'1.18', color:'#0d2845', marginBottom:'16px', letterSpacing:'-0.015em' }}>
+        Are you ready for<br/>the <em style={{ fontStyle:'italic', color:'#c4a373' }}>next chapter?</em>
+      </h1>
+      <p style={{ fontSize:'15.5px', lineHeight:'1.72', color:'#5a6577', marginBottom:'36px', maxWidth:'420px' }}>
+        A few quick questions. Under 3 minutes. You'll get a personalised read on where you are, how the Apex Executive MBA fits your goal, and your clearest career pathways forward.
+      </p>
+      <div style={{ display:'flex', gap:'9px', flexWrap:'wrap', marginBottom:'40px' }}>
+        {[['◷','3 minutes'],['◈','Personalised pathways'],['✦','No obligation']].map(([ic,t],i)=>(
+          <div key={i} style={{ display:'flex', alignItems:'center', gap:'6px', background:'#F1F3F8', border:'1px solid #DCE1E9',
+            borderRadius:'8px', padding:'6px 13px', fontSize:'13px', color:'#56627a' }}>
+            <span style={{ color:'#c4a373', fontSize:'11px' }}>{ic}</span> {t}
+          </div>
+        ))}
+      </div>
+      <button className="btn-start" onClick={onStart}>Begin the check <Ic.ChevRight /></button>
+      <p style={{ marginTop:'24px', fontSize:'12px', color:'#9aa3b2', lineHeight:'1.6' }}>
+        For working professionals · 100% online · Cohort of 24 senior leaders
+      </p>
+    </div>
+  );
+}
+
+/* ─── AFFIRMATION ────────────────────────────────────────────────────────── */
+function Affirmation({ text, progress }) {
+  return (
+    <div className="anim-scaleIn" style={{ padding:'64px 40px', display:'flex', flexDirection:'column',
+      alignItems:'center', justifyContent:'center', minHeight:'320px', textAlign:'center', position:'relative' }}>
+      <div style={{ width:'56px', height:'56px', borderRadius:'50%', border:'2px solid #E7D4A8', background:'#FBF5EA',
+        display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'28px', color:'#c4a373', fontSize:'20px',
+        animation:'glowPulse 2s ease-in-out infinite' }}>✦</div>
+      <p style={{ fontFamily:"'Fraunces', Georgia, serif", fontSize:'21px', fontStyle:'italic', fontWeight:'400',
+        lineHeight:'1.55', color:'#1a2438', maxWidth:'380px', letterSpacing:'-0.005em' }}>"{text}"</p>
+      <div style={{ position:'absolute', bottom:'28px', left:'50%', transform:'translateX(-50%)', width:'44px', height:'2px',
+        background:'#E1E5EC', borderRadius:'2px', overflow:'hidden' }}>
+        <div style={{ height:'100%', width:`${progress}%`, background:'#c4a373', borderRadius:'2px', transition:'width 0.08s linear' }} />
+      </div>
+    </div>
+  );
+}
+
+/* ─── GENERIC QUESTION SCREEN (quiz + profile) ───────────────────────────── */
+function QuestionScreen({ kicker, q, sub, options, stepLabel, progress, selected, onSelect, onNext, onBack }) {
+  return (
+    <div>
+      <div style={{ height:'3px', background:'#EBEEF3' }}><div className="prog-fill" style={{ width:`${progress}%` }} /></div>
+      <div className="anim-fadeUp quiz-pad" style={{ padding:'30px 40px 40px' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'30px' }}>
+          <button className="btn-back" onClick={onBack}><Ic.ArrowLeft /> Back</button>
+          <div style={{ fontSize:'13px', color:'#a8b0bd' }}>{stepLabel}</div>
+        </div>
+        <div style={{ marginBottom:'26px' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'14px' }}>
+            <div style={{ width:'5px', height:'5px', borderRadius:'50%', background:'#c4a373' }} />
+            <span style={{ fontSize:'11px', color:'#b18f54', letterSpacing:'0.08em', textTransform:'uppercase', fontWeight:'600' }}>{kicker}</span>
+          </div>
+          <h2 className="serif-lg" style={{ fontFamily:"'Fraunces', Georgia, serif", fontSize:'24px', fontWeight:'600',
+            lineHeight:'1.32', color:'#0d2845', letterSpacing:'-0.01em', marginBottom:'8px' }}>{q}</h2>
+          <p style={{ fontSize:'13.5px', color:'#7c8595', lineHeight:'1.5' }}>{sub}</p>
+        </div>
+        <div style={{ display:'flex', flexDirection:'column', gap:'9px', marginBottom:'26px' }}>
+          {options.map((opt,i)=>(
+            <button key={i} className={`opt ${selected===i?'sel':''}`} onClick={()=>onSelect(i)}>
+              <div className="opt-radio"><div className="opt-radio-dot" /></div>
+              <span>{opt.label}</span>
+            </button>
+          ))}
+        </div>
+        <button className="btn-primary" onClick={onNext} disabled={selected===null}>
+          Continue <Ic.ChevRight />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── CAPTURE (+ optional CV) ────────────────────────────────────────────── */
+function Capture({ form, setForm, onSubmit, error, sending, onBack }) {
+  const fileRef = useRef(null);
+  const onPick = e => { const f = e.target.files && e.target.files[0]; if (f) setForm(s=>({ ...s, cvName: f.name, cvFile: f })); };
+  return (
+    <div className="anim-fadeUp quiz-pad" style={{ padding:'32px 40px 40px' }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'30px' }}>
+        <button className="btn-back" onClick={onBack} disabled={sending}><Ic.ArrowLeft /> Back</button>
+        <div style={{ fontSize:'13px', color:'#a8b0bd' }}>Last step</div>
+      </div>
+      <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'#FBF5EA', border:'1px solid #E7D4A8',
+        borderRadius:'20px', padding:'4px 14px', color:'#8a6a2f', fontSize:'11.5px', letterSpacing:'0.06em',
+        textTransform:'uppercase', fontWeight:'600', marginBottom:'18px' }}><span>✦</span> Almost there</div>
+      <h2 style={{ fontFamily:"'Fraunces', Georgia, serif", fontSize:'28px', fontWeight:'600', lineHeight:'1.3',
+        color:'#0d2845', letterSpacing:'-0.01em', marginBottom:'10px' }}>Where should we send your results?</h2>
+      <p style={{ fontSize:'14px', color:'#5a6577', lineHeight:'1.65', marginBottom:'28px' }}>
+        We'll email your personalised career pathway and match it to Apex alumni in your region. Add your WhatsApp or CV if you'd like your advisor to prepare properly — both optional.
+      </p>
+      <div style={{ display:'flex', flexDirection:'column', gap:'12px', marginBottom:'8px' }}>
+        <div>
+          <label style={{ display:'block', fontSize:'11.5px', color:'#7c8595', marginBottom:'6px', letterSpacing:'0.06em', textTransform:'uppercase', fontWeight:'500' }}>Full Name</label>
+          <input type="text" className="f-input" placeholder="Your name" value={form.name} onChange={e=>setForm(f=>({...f, name:e.target.value}))} />
+        </div>
+        <div>
+          <label style={{ display:'block', fontSize:'11.5px', color:'#7c8595', marginBottom:'6px', letterSpacing:'0.06em', textTransform:'uppercase', fontWeight:'500' }}>Work Email</label>
+          <input type="email" className="f-input" placeholder="you@company.com" value={form.email} onChange={e=>setForm(f=>({...f, email:e.target.value}))} />
+        </div>
+        <div>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'6px' }}>
+            <label style={{ display:'flex', alignItems:'center', gap:'7px', fontSize:'11.5px', color:'#7c8595', letterSpacing:'0.06em', textTransform:'uppercase', fontWeight:'500' }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="#25D366" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.533 5.845L.057 23.5l5.797-1.448A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.807 9.807 0 01-5.003-1.368l-.36-.214-3.716.927.994-3.628-.233-.373A9.789 9.789 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+              WhatsApp
+            </label>
+            <span style={{ fontSize:'11px', color:'#9c7b3f', fontWeight:'600', letterSpacing:'0.04em' }}>OPTIONAL</span>
+          </div>
+          <input type="tel" className="f-input" placeholder="+33 6 12 34 56 78" value={form.whatsapp} onChange={e=>setForm(f=>({...f, whatsapp:e.target.value}))} style={{ letterSpacing:'0.02em' }} />
+        </div>
+        <div>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'6px' }}>
+            <label style={{ fontSize:'11.5px', color:'#7c8595', letterSpacing:'0.06em', textTransform:'uppercase', fontWeight:'500' }}>Attach your CV</label>
+            <span style={{ fontSize:'11px', color:'#9c7b3f', fontWeight:'600', letterSpacing:'0.04em' }}>OPTIONAL</span>
+          </div>
+          <div className={`cv-drop ${form.cvName?'has':''}`} onClick={()=>fileRef.current && fileRef.current.click()}>
+            <span style={{ color: form.cvName?'#0f7a5a':'#9c7b3f', display:'flex' }}>{form.cvName ? <Ic.Check/> : <Ic.Paperclip/>}</span>
+            <span style={{ fontSize:'13.5px', color: form.cvName?'#0d2845':'#7c8595' }}>
+              {form.cvName ? form.cvName : "Tap to attach a PDF or Word CV"}
+            </span>
+          </div>
+          <input ref={fileRef} type="file" accept=".pdf,.doc,.docx" style={{ display:'none' }} onChange={onPick} />
+          <p style={{ fontSize:'11.5px', color:'#9aa3b2', marginTop:'6px', lineHeight:'1.55' }}>
+            Sharing your CV lets your advisor prepare a deeper, tailored review before you even speak.
+          </p>
+        </div>
+      </div>
+      <div style={{ background:'#F4F6FA', border:'1px solid #E3E7EE', borderRadius:'8px', padding:'10px 14px', marginBottom:'18px', marginTop:'6px' }}>
+        <p style={{ fontSize:'11.5px', color:'#8a93a4', lineHeight:'1.65', margin:0 }}>
+          Your details are used only to deliver your results and, if you choose, connect you with an Apex Programme Advisor. No third-party sharing. Unsubscribe anytime.
+        </p>
+      </div>
+      {error && <p style={{ fontSize:'13px', color:'#C0392B', marginBottom:'14px', fontWeight:'500' }}>{error}</p>}
+      <button className="btn-primary" onClick={onSubmit} disabled={sending}>
+        {sending ? <><span className="spinner" /> Sending…</> : <>See My Career Pathway <Ic.ChevRight /></>}
+      </button>
+    </div>
+  );
+}
+
+/* ─── ADVISORY RESULT ────────────────────────────────────────────────────── */
+function Result({ profileKey, form, answers, focus, edu, score, emailStatus }) {
+  const A = buildAdvisory(answers, focus, edu, score);
+  const P = A.P, F = A.F;
+  const firstName = form.name ? form.name.trim().split(' ')[0] : null;
+
+  const segments = [
+    { label:'Budget readiness',   pct: profileKey==='hot'?82:profileKey==='warm'?58:35 },
+    { label:'Career urgency',     pct: profileKey==='hot'?88:profileKey==='warm'?62:30 },
+    { label:'Programme fit',      pct: profileKey==='hot'?90:profileKey==='warm'?70:45 },
+    { label:'Decision authority', pct: profileKey==='hot'?85:profileKey==='warm'?65:42 },
+  ];
+
+  return (
+    <div className="anim-fadeUp">
+      <div className="result-hero" style={{ padding:'40px 40px 34px', background:P.accentBg, borderBottom:`1px solid ${P.accentBorder}` }}>
+        <div style={{ marginBottom:'26px' }}><Wordmark sub="Career Clarity Check" size="sm" /></div>
+        <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'20px' }}>
+          <div style={{ width:'52px', height:'52px', borderRadius:'50%', border:`1px solid ${P.accentColor}40`,
+            background:`${P.accentColor}12`, display:'flex', alignItems:'center', justifyContent:'center', color:P.accentColor }}>
+            <Ic.Compass />
+          </div>
+          <div>
+            <div style={{ fontSize:'11px', color:P.accentColor, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'2px', fontWeight:'600' }}>{P.badge}</div>
+            <div style={{ fontSize:'12px', color:'#7c8595' }}>Your personalised career pathway</div>
+          </div>
+        </div>
+        <h1 className="result-hl" style={{ fontFamily:"'Fraunces', Georgia, serif", fontSize:'31px', fontWeight:'700',
+          color:'#0d2845', lineHeight:'1.2', letterSpacing:'-0.02em', marginBottom:'12px' }}>
+          {firstName ? `${firstName}, ` : ''}{P.headline}
+        </h1>
+        <p style={{ fontSize:'14.5px', lineHeight:'1.7', color:'#54607a' }}>{P.body}</p>
+      </div>
+
+      <div className="result-body" style={{ padding:'30px 40px 40px' }}>
+
+        <div style={{ marginBottom:'22px' }}>
+          <p style={{ fontSize:'11px', color:'#9aa3b2', letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'8px', fontWeight:'600' }}>Where you are</p>
+          <p style={{ fontSize:'14px', color:'#3a4759', lineHeight:'1.68' }}>{A.where}</p>
+        </div>
+
+        <div style={{ background:'#FBF7F0', border:'1px solid #EADFC9', borderLeft:'3px solid #c4a373', borderRadius:'0 12px 12px 0', padding:'16px 18px', marginBottom:'22px' }}>
+          <p style={{ fontSize:'11px', color:'#9c7b3f', letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'8px', fontWeight:'700' }}>
+            How the Apex EMBA builds your goal — {F.title}
+          </p>
+          <p style={{ fontSize:'13.5px', color:'#3a4759', lineHeight:'1.65', marginBottom:'12px' }}>
+            There isn't a single module named for your exact goal — and we'd rather be straight about that. But it's built right through the programme:
+          </p>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:'7px', marginBottom:'12px' }}>
+            {F.modules.map((m,i)=>(
+              <span key={i} style={{ fontSize:'12px', color:'#0d2845', background:'#fff', border:'1px solid #E7D4A8', borderRadius:'7px', padding:'5px 11px', fontWeight:'500' }}>{m}</span>
+            ))}
+          </div>
+          <p style={{ fontSize:'13.5px', color:'#3a4759', lineHeight:'1.65', margin:0 }}>
+            Better still, your <strong style={{ color:'#0d2845' }}>capstone project</strong> can {F.capstone} — so you graduate with proof, not just theory.
+          </p>
+        </div>
+
+        <div style={{ marginBottom:'22px' }}>
+          <p style={{ fontSize:'11px', color:'#9aa3b2', letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'11px', fontWeight:'600' }}>Your career pathways</p>
+          <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+            {F.pathways.map((p,i)=>(
+              <div key={i} style={{ display:'flex', gap:'11px', alignItems:'center' }}>
+                <div style={{ flexShrink:0, width:'26px', height:'26px', borderRadius:'50%', background:'#0d2845', color:'#e8cf9c',
+                  fontFamily:"'Fraunces', Georgia, serif", fontWeight:'700', fontSize:'13px', display:'flex', alignItems:'center', justifyContent:'center' }}>{i+1}</div>
+                <span style={{ fontSize:'13.5px', color:'#28303f', lineHeight:'1.45' }}>{p}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ background:'#F4F6FA', border:'1px solid #E3E7EE', borderRadius:'12px', padding:'18px 20px', marginBottom:'22px' }}>
+          <p style={{ fontSize:'11px', color:'#8a93a4', letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:'14px', fontWeight:'600' }}>Readiness Snapshot</p>
+          <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+            {segments.map((seg,i)=>(
+              <div key={i}>
+                <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'5px' }}>
+                  <span style={{ fontSize:'12.5px', color:'#54607a' }}>{seg.label}</span>
+                  <span style={{ fontSize:'12.5px', color:P.accentColor, fontWeight:'600' }}>{seg.pct}%</span>
+                </div>
+                <div style={{ height:'4px', background:'#E3E7EE', borderRadius:'2px', overflow:'hidden' }}>
+                  <div style={{ height:'100%', width:`${seg.pct}%`, background:P.accentColor, borderRadius:'2px' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {form.email && (
+          <div style={{ background:'#FBF5EA', border:'1px solid #E7D4A8', borderRadius:'10px', padding:'13px 16px', marginBottom:'22px',
+            display:'flex', alignItems:'flex-start', gap:'10px' }}>
+            <span style={{ color:P.accentColor, marginTop:'2px', flexShrink:0, fontSize:'13px' }}>{emailStatus==='sent'?'✓':'✦'}</span>
+            <p style={{ fontSize:'13px', color:'#5a6577', lineHeight:'1.65', margin:0 }}>
+              {emailStatus==='sent'
+                ? <span>Your full pathway report is on its way to <span style={{ color:'#0d2845', fontWeight:'500' }}>{form.email}</span>.{form.cvName?<span> Your advisor will review <span style={{color:'#0d2845',fontWeight:'500'}}>{form.cvName}</span> before your call.</span>:null}{form.whatsapp?<span> They may also reach you on <span style={{color:'#0d2845',fontWeight:'500'}}>{form.whatsapp}</span>.</span>:null}</span>
+                : <span>We've recorded your result for <span style={{ color:'#0d2845', fontWeight:'500' }}>{form.email}</span>. If the email doesn't arrive shortly, you can still book directly below — your advisor has your details.</span>}
+            </p>
+          </div>
+        )}
+
+        <a href={CONFIG.CALENDLY_URL} target="_blank" rel="noopener noreferrer" style={{ display:'block', textDecoration:'none', marginBottom:'10px' }}>
+          <button className="btn-primary" style={{ fontSize:'15.5px', padding:'18px 24px' }}>
+            <Ic.Calendar /> Book My Advisor Call
+          </button>
+        </a>
+        <p style={{ textAlign:'center', fontSize:'12px', color:'#9aa3b2', marginBottom:'18px' }}>
+          No commitment · 20 minutes · Your questions answered properly
+        </p>
+
+        <div style={{ borderTop:'1px solid #EBEEF3', marginTop:'28px', paddingTop:'22px' }}>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:'6px 18px', justifyContent:'center', marginBottom:'12px' }}>
+            {['EQF Level 7 · 90 ECTS','Dual Certification · France + UK','100% Online · 12 Months','Cohort of 24 Senior Leaders'].map((t,i)=>(
+              <span key={i} style={{ fontSize:'11px', color:'#a8b0bd', letterSpacing:'0.04em' }}>{t}</span>
+            ))}
+          </div>
+          <p style={{ textAlign:'center', fontSize:'11px', color:'#b9c0cb', fontFamily:"'Fraunces', Georgia, serif", fontStyle:'italic', letterSpacing:'0.02em' }}>
+            Apex École de Management · Lyon · Paris — Learning today. Leading tomorrow.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── ROOT APP ───────────────────────────────────────────────────────────── */
+function App() {
+  const [phase,      setPhase]      = useState('intro');
+  const [qIdx,       setQIdx]       = useState(0);
+  const [pIdx,       setPIdx]       = useState(0);
+  const [answers,    setAnswers]    = useState({});
+  const [profileAns, setProfileAns] = useState({ focus:null, edu:null });
+  const [selected,   setSelected]   = useState(null);
+  const [showAffirm, setShowAffirm] = useState(false);
+  const [affirmText, setAffirmText] = useState('');
+  const [affirmProg, setAffirmProg] = useState(0);
+  const [score,      setScore]      = useState(0);
+  const [profile,    setProfile]    = useState(null);
+  const [form,       setForm]       = useState({ name:'', email:'', whatsapp:'', cvName:'', cvFile:null });
+  const [formError,  setFormError]  = useState('');
+  const [sending,    setSending]    = useState(false);
+  const [emailStatus,setEmailStatus]= useState('idle');
+  const [visible,    setVisible]    = useState(true);
+  const [frameKey,   setFrameKey]   = useState(0);
+
+  const affTimerRef = useRef(null);
+  const rafRef      = useRef(null);
+
+  const Q  = QS[qIdx];
+  const PQ = PROFILE_QS[pIdx];
+
+  const TOTAL = QS.length + PROFILE_QS.length;
+  const quizProgress    = ((qIdx + (selected!==null?1:0)) / TOTAL) * 100;
+  const profileProgress = ((QS.length + pIdx + (selected!==null?1:0)) / TOTAL) * 100;
+
+  const fade = useCallback((fn, delay=300) => {
+    setVisible(false);
+    setTimeout(()=>{ fn(); setVisible(true); setFrameKey(k=>k+1); }, delay);
+  }, []);
+
+  const onSelect = idx => setSelected(idx);
+
+  const advanceQuiz = useCallback((curIdx) => {
+    if (curIdx < QS.length - 1) { setQIdx(curIdx + 1); setSelected(null); }
+    else { setPhase('profile'); setPIdx(0); setSelected(null); }
+  }, []);
+
+  const onQuizNext = () => {
+    if (selected === null) return;
+    const opt      = Q.options[selected];
+    const newScore = score + opt.score;
+    const newAns   = { ...answers, [Q.id]: opt };
+    setAnswers(newAns); setScore(newScore);
+
+    if (Q.affirmation) {
+      setVisible(false);
+      setTimeout(()=>{
+        setAffirmText(Q.affirmation); setAffirmProg(0); setShowAffirm(true); setVisible(true); setFrameKey(k=>k+1);
+        const t0 = Date.now(), DUR = 2900;
+        const tick = () => { const pct = Math.min(100, ((Date.now()-t0)/DUR)*100); setAffirmProg(pct); if (pct<100) rafRef.current = requestAnimationFrame(tick); };
+        rafRef.current = requestAnimationFrame(tick);
+        affTimerRef.current = setTimeout(()=>{
+          setVisible(false);
+          setTimeout(()=>{ setShowAffirm(false); advanceQuiz(qIdx); setVisible(true); setFrameKey(k=>k+1); }, 300);
+        }, DUR);
+      }, 300);
+    } else {
+      fade(()=> advanceQuiz(qIdx));
+    }
+  };
+
+  const onProfileNext = () => {
+    if (selected === null) return;
+    const val = PQ.options[selected].val;
+    const newPA = { ...profileAns, [PQ.key]: val };
+    setProfileAns(newPA);
+    if (pIdx < PROFILE_QS.length - 1) {
+      fade(()=>{ setPIdx(pIdx + 1); setSelected(null); });
+    } else {
+      setProfile(getProfile(score));
+      fade(()=>{ setPhase('capture'); setSelected(null); });
+    }
+  };
+
+  const onBack = () => {
+    if (sending) return;
+    if (phase === 'capture') { setFormError(''); fade(()=>{ setPhase('profile'); setPIdx(PROFILE_QS.length-1);
+      setSelected(PROFILE_QS[PROFILE_QS.length-1].options.findIndex(o=>o.val===profileAns[PROFILE_QS[PROFILE_QS.length-1].key])); }); return; }
+    if (phase === 'profile') {
+      if (pIdx === 0) {
+        const lastQ = QS[QS.length-1]; const la = answers[lastQ.id];
+        if (la) setScore(s=> s - la.score);
+        const na = { ...answers }; if (la) delete na[lastQ.id]; setAnswers(na);
+        fade(()=>{ setPhase('quiz'); setQIdx(QS.length-1); setSelected(la ? lastQ.options.findIndex(o=>o.tag===la.tag) : null); });
+        return;
+      }
+      const prevKey = PROFILE_QS[pIdx-1].key;
+      fade(()=>{ setPIdx(pIdx-1); setSelected(PROFILE_QS[pIdx-1].options.findIndex(o=>o.val===profileAns[prevKey])); });
+      return;
+    }
+    if (qIdx === 0) { fade(()=>{ setPhase('intro'); setScore(0); setAnswers({}); setSelected(null); }); return; }
+    const prevQ = QS[qIdx-1]; const prevAns = answers[prevQ.id];
+    if (prevAns) setScore(s=> s - prevAns.score);
+    const na = { ...answers }; delete na[prevQ.id]; setAnswers(na);
+    fade(()=>{ setQIdx(qIdx-1); setSelected(prevAns ? prevQ.options.findIndex(o=>o.tag===prevAns.tag) : null); });
+  };
+
+  const buildPayload = async (prof) => {
+    const A = buildAdvisory(answers, profileAns.focus, profileAns.edu, score);
+    let cv = null;
+    if (form.cvFile) {
+      try { cv = { filename: form.cvName, mime: form.cvFile.type || 'application/octet-stream', base64: await fileToBase64(form.cvFile) }; }
+      catch (e) { cv = null; }
+    }
+    return {
+      source: 'apex_emba_career_pathway',
+      submitted_at: new Date().toISOString(),
+      drive_folder_id: '1ZNtbALyHVK1ZC1wMV3dJlk8cuzRe9Q1C',
+      name: form.name, email: form.email, whatsapp: form.whatsapp,
+      profile: prof.toUpperCase(), score, score_max: MAX_SCORE,
+      focus_area: profileAns.focus, focus_title: A.F.title,
+      education_level: profileAns.edu, region: ansLabel(answers,5),
+      answers: Object.values(answers).map(o => o.tag),
+      cv,
+      prospect_email: { to: form.email, subject: `${form.name ? form.name.trim().split(' ')[0]+', ' : ''}your Apex Career Clarity result`, html: emailProspect(form, A) },
+      advisor_email:  { to: CONFIG.ADVISOR_EMAIL, subject: `New lead — ${form.name||'(no name)'} · ${A.P.badge} · ${A.F.title}`, html: emailAdvisor(form, A, answers, profileAns, score) },
+      calendly: CONFIG.CALENDLY_URL,
+    };
+  };
+
+  const onSubmit = async () => {
+    if (sending) return;
+    if (!form.name.trim())                { setFormError('Please enter your name.'); return; }
+    if (!/\S+@\S+\.\S+/.test(form.email)) { setFormError('Please enter a valid email address.'); return; }
+    setFormError(''); setSending(true);
+    const prof = profile || getProfile(score);
+    let status = 'error';
+    try {
+      const payload = await buildPayload(prof);
+      console.log('[Apex Career Pathway] payload', payload);
+      await postToWebhook(payload);
+      status = 'sent';
+    } catch (e) {
+      console.warn('[Apex Career Pathway] webhook send failed:', e && e.message);
+      status = 'error';
+    }
+    setEmailStatus(status);
+    setSending(false);
+    fade(()=> setPhase('result'));
+  };
+
+  useEffect(()=>()=>{ if (affTimerRef.current) clearTimeout(affTimerRef.current); if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+
+  return (
+    <Card visible={visible}>
+      {phase === 'intro' && <Intro onStart={()=> fade(()=> setPhase('quiz'))} />}
+
+      {phase === 'quiz' && showAffirm && (
+        <Affirmation key={frameKey} text={affirmText} progress={affirmProg} />
+      )}
+      {phase === 'quiz' && !showAffirm && (
+        <QuestionScreen key={frameKey}
+          kicker={Q.bant==='need'?'Career fit':Q.bant==='timeline'?'Timing':Q.bant==='authority'&&Q.id===1?'Your role':Q.bant==='authority'&&Q.id===3?'Experience':Q.bant==='authority'?'Location':Q.bant==='budget'?'Investment':'Next step'}
+          q={Q.q} sub={Q.sub} options={Q.options} stepLabel={`${qIdx+1} of ${TOTAL}`}
+          progress={quizProgress} selected={selected} onSelect={onSelect} onNext={onQuizNext} onBack={onBack} />
+      )}
+
+      {phase === 'profile' && (
+        <QuestionScreen key={'p'+frameKey}
+          kicker={PQ.kicker} q={PQ.q} sub={PQ.sub} options={PQ.options}
+          stepLabel={`${QS.length + pIdx + 1} of ${TOTAL}`} progress={profileProgress}
+          selected={selected} onSelect={onSelect} onNext={onProfileNext} onBack={onBack} />
+      )}
+
+      {phase === 'capture' && (
+        <Capture key={frameKey} form={form} setForm={setForm} onSubmit={onSubmit} error={formError} sending={sending} onBack={onBack} />
+      )}
+
+      {phase === 'result' && (
+        <Result key={frameKey} profileKey={profile} form={form} answers={answers} focus={profileAns.focus} edu={profileAns.edu} score={score} emailStatus={emailStatus} />
+      )}
+    </Card>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
