@@ -404,7 +404,6 @@ async function postToWebhook(payload) {
       body: JSON.stringify(payload),
       signal: ctrl.signal,
       mode: 'cors',
-      keepalive: true,
     });
   } finally { clearTimeout(t); }
 }
